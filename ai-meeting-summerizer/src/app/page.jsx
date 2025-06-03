@@ -5,7 +5,6 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import axios from "axios";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,11 +20,12 @@ import {
 import Image from "next/image";
 
 export default function Home() {
-  const { profile, isLoading, error } = useUser();
+  const { profile, isLoading } = useUser();
   const router = useRouter();
-  const [selectedFile, setSelectedFile] = useState(null);
   const [transcript, setTranscript] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState("");
+  const [actionItems, setActionItems] = useState([]);
+  const [audioFile, setAudioFile] = useState(null);
 
   const handleLogout = async () => {
     try {
@@ -38,49 +38,44 @@ export default function Home() {
 
   const getInitials = (name) => {
     if (!name) return "AI";
-    const parts = name.split(' ');
-    return parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : name[0].toUpperCase();
+    const parts = name.split(" ");
+    return parts.length > 1
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : name[0].toUpperCase();
+  };
+
+  const handleAudioChange = (e) => {
+    setAudioFile(e.target.files[0]);
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile) return alert("Please select an audio file");
-    setLoading(true);
+  if (!audioFile) return alert("Please upload an audio file.");
 
-    const formData = new FormData();
-    formData.append("audio", selectedFile);
+  const formData = new FormData();
+  formData.append("file", audioFile);
 
-    const res = await fetch("/api/transcribe", {
-      method: "POST",
-      body: formData,
-    });
+  const uploadRes = await fetch("/api/transcribe", {
+    method: "POST",
+    body: formData,
+  });
 
-    const { id } = await res.json();
-    let status = "queued";
-    let transcriptText = "";
+  const uploadData = await uploadRes.json();
+  setTranscript(uploadData.transcript);
 
-    while (status !== "completed") {
-      const pollRes = await fetch(`https://api.assemblyai.com/v2/transcript/${id}`, {
-        headers: {
-          authorization: process.env.NEXT_PUBLIC_ASSEMBLYAI_API_KEY,
-        },
-      });
+  const gptRes = await fetch("/api/summary", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcript: uploadData.transcript }),
+  });
 
-      const data = await pollRes.json();
-      status = data.status;
-      if (status === "completed") {
-        transcriptText = data.text;
-        setTranscript(transcriptText);
-      } else {
-        await new Promise((r) => setTimeout(r, 3000));
-      }
-    }
+  const result = await gptRes.json();
+  setSummary(result.summary || "");
+  setActionItems(result.action_items || []);
+};
 
-    setLoading(false);
-  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black text-white px-6 py-10 flex flex-col items-center relative">
-
       <div className="absolute top-6 right-6 z-10">
         {isLoading ? (
           <div className="w-10 h-10 rounded-full bg-gray-700 animate-pulse"></div>
@@ -132,16 +127,10 @@ export default function Home() {
           <input
             type="file"
             accept="audio/*"
-            onChange={(e) => setSelectedFile(e.target.files[0])}
-            className="mb-4 text-sm text-gray-200 file:mr-4 file:py-2 file:px-4
-                       file:rounded-full file:border-0
-                       file:text-sm file:font-semibold
-                       file:bg-blue-600 file:text-white
-                       hover:file:bg-blue-700 transition"
+            onChange={handleAudioChange}
+            className="mb-4 text-sm text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
           />
-          <Button onClick={handleSubmit} disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">
-            {loading ? "Transcribing..." : "Submit"}
-          </Button>
+          <Button onClick={handleSubmit} className="w-full bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">Submit</Button>
         </CardContent>
       </Card>
 
@@ -155,7 +144,7 @@ export default function Home() {
       <Card className="w-full max-w-xl mb-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-md">
         <CardContent className="p-6">
           <h2 className="text-xl font-semibold mb-2 text-white">Summary</h2>
-          <p className="text-gray-300">[Summary will appear here]</p>
+          <p className="text-gray-300 whitespace-pre-wrap">{summary || "[Summary will appear here]"}</p>
         </CardContent>
       </Card>
 
@@ -163,8 +152,11 @@ export default function Home() {
         <CardContent className="p-6">
           <h2 className="text-xl font-semibold mb-2 text-white">Action Items</h2>
           <ul className="list-disc list-inside text-gray-300">
-            <li>[Action Item 1]</li>
-            <li>[Action Item 2]</li>
+            {actionItems.length ? (
+              actionItems.map((item, index) => <li key={index}>{item}</li>)
+            ) : (
+              <li>[Action Items will appear here]</li>
+            )}
           </ul>
         </CardContent>
       </Card>
