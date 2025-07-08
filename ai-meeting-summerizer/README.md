@@ -4,20 +4,20 @@ Conclude AI is a smart, end-to-end meeting summarization tool that allows users 
 
 ---
 
-## 🚀 Features
+## Features
 
-* 🎧 Upload or record meeting audio
-* ✨ Automatic transcription via AssemblyAI
-* 🦾 LLM-powered meeting summaries and action item extraction using Google Gemini
-* 🗂️ Authenticated user dashboard with history of all previous meetings
-* 🖼️ Clean, responsive UI built with Tailwind CSS and shadcn/ui
-* 🔐 Secure login system using Firebase Authentication
-* ☁️ Data storage and retrieval with Firestore (meeting metadata, summaries, and tasks)
-* 📦 Planned: Folder support, export to PDF/Markdown, Slack/Teams integration
+*  Upload or record meeting audio
+*  Automatic transcription via AssemblyAI
+*  LLM-powered meeting summaries and action item extraction using Google Gemini
+*  Authenticated user dashboard with history of all previous meetings
+*  Clean, responsive UI built with Tailwind CSS and shadcn/ui
+*  Secure login system using Firebase Authentication
+*  Data storage and retrieval with Firestore (meeting metadata, summaries, and tasks)
+*  Planned: Folder support, export to PDF/Markdown, Slack/Teams integration
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer          | Technology                                           |
 | -------------- | ---------------------------------------------------- |
@@ -31,7 +31,7 @@ Conclude AI is a smart, end-to-end meeting summarization tool that allows users 
 
 ---
 
-## 🧹 Project Architecture
+##  Project Architecture
 
 ```
 Frontend (Next.js + Tailwind)
@@ -46,7 +46,7 @@ Frontend (Next.js + Tailwind)
 ```
 
 
-## 📁 Folder Structure
+##  Folder Structure
 
 ```
 /app
@@ -63,7 +63,7 @@ Frontend (Next.js + Tailwind)
 
 ---
 
-## 🤖 Prompt Engineering (Gemini API)
+##  Prompt Engineering (Gemini API)
 
 We use structured prompting for consistent results:
 
@@ -71,16 +71,16 @@ We use structured prompting for consistent results:
 
 ---
 
-## 📌 Upcoming Features
+##  Upcoming Features
 
-* 🔖 Folder creation & filtering (e.g., per club/team)
-* 📄 Export to PDF/Markdown
-* 🔁 Slack / Teams integration (auto-post summaries)
-* 📊 Meeting analytics (avg. duration, task count per user)
+*  Folder creation & filtering (e.g., per club/team)
+*  Export to PDF/Markdown
+*  Slack / Teams integration (auto-post summaries)
+*  Meeting analytics (avg. duration, task count per user)
 
 ---
 
-## 👨‍💼 Author
+##  Author
 
 **Chaitanya Vaidya**
 🔗 [LinkedIn](https://www.linkedin.com/in/chaitanyavaidya10/)
